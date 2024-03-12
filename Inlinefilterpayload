@@ -1,0 +1,98 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+interface DataItem {
+  id: number;
+  title: string;
+  body: string;
+}
+
+interface Payload {
+  filters: { [key: string]: string };
+  filteredData: DataItem[];
+}
+
+const ExampleComponent: React.FC = () => {
+  const [data, setData] = useState<DataItem[]>([]);
+  const [filteredData, setFilteredData] = useState<DataItem[]>([]);
+  const [filters, setFilters] = useState<{ [key: string]: string }>({});
+
+  useEffect(() => {
+    fetchInitialData();
+  }, []);
+
+  const fetchInitialData = async () => {
+    try {
+      const response = await axios.get<DataItem[]>('https://jsonplaceholder.typicode.com/posts');
+      setData(response.data);
+      setFilteredData(response.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  const handleFilterChange = (columnName: string, value: string) => {
+    setFilters(prevFilters => ({
+      ...prevFilters,
+      [columnName]: value
+    }));
+
+    const filtered = data.filter(item => {
+      for (const key in filters) {
+        if (filters.hasOwnProperty(key)) {
+          if (!item[key as keyof DataItem].toLowerCase().includes(filters[key].toLowerCase())) {
+            return false;
+          }
+        }
+      }
+      return true;
+    });
+
+    setFilteredData(filtered);
+    postData({ filters, filteredData: filtered });
+  };
+
+  const postData = async (payload: Payload) => {
+    try {
+      const response = await axios.post('https://jsonplaceholder.typicode.com/posts', payload);
+      console.log('Post request response:', response.data);
+    } catch (error) {
+      console.error('Error posting data:', error);
+    }
+  };
+
+  return (
+    <div>
+      <input
+        type="text"
+        placeholder="Filter by Title"
+        onChange={e => handleFilterChange('title', e.target.value)}
+      />
+      <input
+        type="text"
+        placeholder="Filter by Body"
+        onChange={e => handleFilterChange('body', e.target.value)}
+      />
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Body</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredData.map(item => (
+            <tr key={item.id}>
+              <td>{item.id}</td>
+              <td>{item.title}</td>
+              <td>{item.body}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+export default ExampleComponent;
