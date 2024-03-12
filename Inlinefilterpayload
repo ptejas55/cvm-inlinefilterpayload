@@ -40,7 +40,8 @@ const ExampleComponent: React.FC = () => {
     const filtered = data.filter(item => {
       for (const key in filters) {
         if (filters.hasOwnProperty(key)) {
-          if (!item[key as keyof DataItem].toLowerCase().includes(filters[key].toLowerCase())) {
+          const propertyValue = (item[key as keyof DataItem] as string).toLowerCase();
+          if (!propertyValue.includes(filters[key].toLowerCase())) {
             return false;
           }
         }
