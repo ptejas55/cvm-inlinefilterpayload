@@ -18,13 +18,14 @@ function generateFilterPayload(filters: Filter[]): any {
 
     if (datatype === 'number') {
       let operator: ComparisonOperator;
+      let numericValue = value;
       if (typeof value === 'string') {
         operator = value.match(/(>=|<=|>|<|=)/)?.[0] as ComparisonOperator;
-        value = Number(value.replace(/(>=|<=|>|<|=)/, ''));
+        numericValue = Number(value.replace(/(>=|<=|>|<|=)/, ''));
       } else {
         operator = '=';
       }
-      payload[field][operator] = value;
+      payload[field][operator] = numericValue;
     } else if (datatype === 'string') {
       if (typeof value === 'string') {
         if (value.includes(',')) {
