@@ -3,7 +3,7 @@ type ComparisonOperator = '=' | '<' | '>' | '<=' | '>=' | 'in' | 'contains';
 interface Filter {
   field: string;
   value: any;
-  datatype: string; // Assuming datatype can be 'string' or 'number'
+  datatype: string; 
 }
 
 function generateFilterPayload(filters: Filter[]): any {
